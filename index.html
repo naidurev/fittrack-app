@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="FitTrack">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#0a0a0f">
+    <meta name="theme-color" content="#0f1410">
     <title>FitTrack Pro</title>
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon.png">
@@ -16,10 +16,13 @@
 <body>
     <header>
         <h1>💪 FitTrack Pro</h1>
-        <button id="restTimerBtn" class="rest-timer-btn" style="display:none;">
-            <span class="rest-timer-text">Rest Timer</span>
-            <span class="rest-timer-display">00:00</span>
-        </button>
+        <div class="header-actions">
+            <button id="themeToggle" class="icon-btn" title="Toggle Theme">🌙</button>
+            <button id="restTimerBtn" class="rest-timer-btn" style="display:none;">
+                <span class="rest-timer-text">Rest</span>
+                <span class="rest-timer-display">00:00</span>
+            </button>
+        </div>
     </header>
 
     <main>
@@ -29,8 +32,41 @@
                 <button class="btn-primary btn-large" id="startWorkoutBtn">Start Workout</button>
             </section>
 
+            <!-- Quick Actions -->
+            <section class="card" id="quickActionsCard" style="display:none;">
+                <h2>Quick Actions</h2>
+                <div class="quick-actions">
+                    <button class="btn-secondary" id="repeatLastBtn">🔄 Repeat Last Workout</button>
+                    <button class="btn-secondary" id="templatesBtn">📋 Templates</button>
+                    <button class="btn-secondary" id="statsBtn">📊 Stats & Charts</button>
+                </div>
+            </section>
+
+            <!-- Streaks & Body Weight -->
             <section class="card">
-                <h2>Previous Workout Sessions</h2>
+                <h2>Your Progress</h2>
+                <div class="stats-row">
+                    <div class="stat">
+                        <span class="stat-value" id="streakCount">0</span>
+                        <span class="stat-label">Day Streak</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="bodyWeightDisplay">--</span>
+                        <span class="stat-label">Current Weight</span>
+                    </div>
+                </div>
+                <button class="btn-secondary" id="logWeightBtn">Log Body Weight</button>
+            </section>
+
+            <!-- Workout History -->
+            <section class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2 style="margin-bottom: 0;">Previous Workouts</h2>
+                    <div>
+                        <button class="icon-btn" id="calendarViewBtn" title="Calendar View">📅</button>
+                        <button class="icon-btn" id="exportBtn" title="Export Data">📥</button>
+                    </div>
+                </div>
                 <div id="historyList" class="history-list">
                     <p class="empty-state">No workout history yet.</p>
                 </div>
@@ -47,6 +83,11 @@
                     </div>
                 </div>
 
+                <div class="input-group">
+                    <label>Session Notes (Optional)</label>
+                    <textarea id="workoutNotes" placeholder="How are you feeling today?" rows="2"></textarea>
+                </div>
+
                 <button class="btn-primary" id="addExerciseBtn">Add Exercise</button>
             </section>
 
@@ -58,68 +99,178 @@
             </section>
         </div>
 
-        <!-- Rest Timer Modal -->
-        <div id="restTimerModal" class="modal" style="display:none;">
-            <div class="modal-content">
-                <h2>Rest Timer</h2>
-                <div class="rest-timer-circle">
-                    <span id="restTimerValue">00:00</span>
+        <!-- Stats & Charts Screen -->
+        <div id="statsScreen" style="display:none;">
+            <section class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2 style="margin-bottom: 0;">Progress Analytics</h2>
+                    <button class="icon-btn" id="closeStatsBtn">✕</button>
                 </div>
-                <div class="input-group">
-                    <label>Set Rest Time (seconds)</label>
-                    <input type="number" id="restTimeInput" value="90" min="1" max="999">
-                </div>
-                <div class="button-row">
-                    <button class="btn-primary" id="startRestBtn">Start</button>
-                    <button class="btn-secondary" id="pauseRestBtn" style="display:none;">Pause</button>
-                    <button class="btn-secondary" id="resumeRestBtn" style="display:none;">Resume</button>
-                    <button class="btn-secondary" id="stopRestBtn">Stop</button>
-                </div>
-                <button class="btn-close" id="closeRestTimerBtn">Close</button>
-            </div>
-        </div>
+            </section>
 
-        <!-- Add Exercise Modal -->
-        <div id="addExerciseModal" class="modal" style="display:none;">
-            <div class="modal-content">
-                <h2>Add Exercise</h2>
-                <div class="input-group">
-                    <label>Exercise Name</label>
-                    <input type="text" id="exerciseName" placeholder="e.g., Bench Press">
-                </div>
-                <div class="button-row">
-                    <button class="btn-primary" id="confirmExerciseBtn">Add</button>
-                    <button class="btn-secondary" id="cancelExerciseBtn">Cancel</button>
-                </div>
-            </div>
-        </div>
+            <section class="card">
+                <h2>Personal Records</h2>
+                <div id="prList"></div>
+            </section>
 
-        <!-- Workout Summary Modal -->
-        <div id="summaryModal" class="modal" style="display:none;">
-            <div class="modal-content">
-                <h2>Workout Complete!</h2>
-                <div class="summary-stats">
-                    <div class="stat">
-                        <span class="stat-value" id="summaryDuration">00:00:00</span>
-                        <span class="stat-label">Duration</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-value" id="summaryExercises">0</span>
-                        <span class="stat-label">Exercises</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-value" id="summarySets">0</span>
-                        <span class="stat-label">Total Sets</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-value" id="summaryVolume">0</span>
-                        <span class="stat-label">Total Volume (lbs)</span>
-                    </div>
-                </div>
-                <button class="btn-primary" id="closeSummaryBtn">Done</button>
-            </div>
+            <section class="card">
+                <h2>Volume by Muscle Group</h2>
+                <div id="muscleGroupChart"></div>
+            </section>
+
+            <section class="card">
+                <h2>Workout Frequency</h2>
+                <canvas id="frequencyChart" width="400" height="200"></canvas>
+            </section>
         </div>
     </main>
+
+    <!-- Add Exercise Modal -->
+    <div id="addExerciseModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h2>Add Exercise</h2>
+            <div class="input-group">
+                <label>Exercise Name</label>
+                <input type="text" id="exerciseName" list="exerciseLibrary" placeholder="Start typing...">
+                <datalist id="exerciseLibrary"></datalist>
+            </div>
+            <div class="input-group">
+                <label>Muscle Group</label>
+                <select id="muscleGroup">
+                    <option value="">Select (Optional)</option>
+                    <option value="chest">Chest</option>
+                    <option value="back">Back</option>
+                    <option value="legs">Legs</option>
+                    <option value="shoulders">Shoulders</option>
+                    <option value="arms">Arms</option>
+                    <option value="core">Core</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>
+                    <input type="checkbox" id="supersetCheck"> Part of Superset
+                </label>
+            </div>
+            <div class="input-group">
+                <label>Exercise Notes</label>
+                <textarea id="exerciseNotes" placeholder="Form cues, how you feel, etc." rows="2"></textarea>
+            </div>
+            <div class="button-row">
+                <button class="btn-primary" id="confirmExerciseBtn">Add</button>
+                <button class="btn-secondary" id="cancelExerciseBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rest Timer Modal -->
+    <div id="restTimerModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h2>Rest Timer</h2>
+            <div class="rest-timer-circle">
+                <span id="restTimerValue">00:00</span>
+            </div>
+            <div class="input-group">
+                <label>Set Rest Time (seconds)</label>
+                <input type="number" id="restTimeInput" value="90" min="1" max="999">
+            </div>
+            <div class="input-group">
+                <label>
+                    <input type="checkbox" id="autoStartRest" checked> Auto-start after completing set
+                </label>
+            </div>
+            <div class="button-row">
+                <button class="btn-primary" id="startRestBtn">Start</button>
+                <button class="btn-secondary" id="pauseRestBtn" style="display:none;">Pause</button>
+                <button class="btn-secondary" id="resumeRestBtn" style="display:none;">Resume</button>
+                <button class="btn-secondary" id="stopRestBtn">Stop</button>
+            </div>
+            <button class="btn-close" id="closeRestTimerBtn">Close</button>
+        </div>
+    </div>
+
+    <!-- Workout Summary Modal -->
+    <div id="summaryModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h2>Workout Complete!</h2>
+            <div class="summary-stats">
+                <div class="stat">
+                    <span class="stat-value" id="summaryDuration">00:00:00</span>
+                    <span class="stat-label">Duration</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value" id="summaryExercises">0</span>
+                    <span class="stat-label">Exercises</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value" id="summarySets">0</span>
+                    <span class="stat-label">Total Sets</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-value" id="summaryVolume">0</span>
+                    <span class="stat-label">Total Volume</span>
+                </div>
+            </div>
+            <div id="prAchievements"></div>
+            <div class="button-row">
+                <button class="btn-primary" id="saveTemplateBtn">💾 Save as Template</button>
+                <button class="btn-secondary" id="shareWorkoutBtn">📤 Share</button>
+            </div>
+            <button class="btn-primary" id="closeSummaryBtn">Done</button>
+        </div>
+    </div>
+
+    <!-- Templates Modal -->
+    <div id="templatesModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h2>Workout Templates</h2>
+            <div id="templatesList"></div>
+            <button class="btn-close" id="closeTemplatesBtn">Close</button>
+        </div>
+    </div>
+
+    <!-- Calendar Modal -->
+    <div id="calendarModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h2>Workout Calendar</h2>
+            <div id="calendarView"></div>
+            <button class="btn-close" id="closeCalendarBtn">Close</button>
+        </div>
+    </div>
+
+    <!-- Body Weight Modal -->
+    <div id="bodyWeightModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h2>Log Body Weight</h2>
+            <div class="input-group">
+                <label>Weight (lbs)</label>
+                <input type="number" id="bodyWeightInput" step="0.1" placeholder="Enter weight">
+            </div>
+            <div class="button-row">
+                <button class="btn-primary" id="saveBodyWeightBtn">Save</button>
+                <button class="btn-secondary" id="cancelBodyWeightBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1RM Calculator Modal -->
+    <div id="rmCalculatorModal" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h2>1RM Calculator</h2>
+            <div class="input-group">
+                <label>Weight Lifted</label>
+                <input type="number" id="rmWeight" placeholder="Weight">
+            </div>
+            <div class="input-group">
+                <label>Reps Completed</label>
+                <input type="number" id="rmReps" placeholder="Reps">
+            </div>
+            <div id="rmResult"></div>
+            <div class="button-row">
+                <button class="btn-primary" id="calculateRMBtn">Calculate</button>
+                <button class="btn-close" id="closeRMBtn">Close</button>
+            </div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
