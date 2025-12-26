@@ -14,82 +14,110 @@
 <body>
     <header>
         <h1>💪 FitTrack Pro</h1>
-        <button id="installBtn" style="display:none;">Install App</button>
+        <button id="restTimerBtn" class="rest-timer-btn" style="display:none;">
+            <span class="rest-timer-text">Rest Timer</span>
+            <span class="rest-timer-display">00:00</span>
+        </button>
     </header>
 
     <main>
-        <section class="card">
-            <h2>Log Workout</h2>
-            
-            <div class="input-group">
-                <label>Exercise</label>
-                <input type="text" id="exerciseName" placeholder="e.g., Bench Press" list="exerciseList">
-                <datalist id="exerciseList">
-                    <option value="Bench Press">
-                    <option value="Squat">
-                    <option value="Deadlift">
-                    <option value="Overhead Press">
-                    <option value="Pull-ups">
-                    <option value="Rows">
-                    <option value="Bicep Curls">
-                    <option value="Tricep Dips">
-                    <option value="Lunges">
-                    <option value="Plank">
-                </datalist>
-            </div>
+        <!-- Home Screen -->
+        <div id="homeScreen">
+            <section class="card center-content">
+                <button class="btn-primary btn-large" id="startWorkoutBtn">Start Workout</button>
+            </section>
 
-            <div class="input-row">
+            <section class="card">
+                <h2>Previous Workout Sessions</h2>
+                <div id="historyList" class="history-list">
+                    <p class="empty-state">No workout history yet.</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- Workout Screen -->
+        <div id="workoutScreen" style="display:none;">
+            <section class="card">
+                <div class="workout-header">
+                    <div class="timer-display">
+                        <span class="timer-label">Workout Duration</span>
+                        <span class="timer-value" id="workoutTimer">00:00:00</span>
+                    </div>
+                </div>
+
+                <button class="btn-primary" id="addExerciseBtn">Add Exercise</button>
+            </section>
+
+            <!-- Current Exercises List -->
+            <div id="currentExercises"></div>
+
+            <section class="card">
+                <button class="btn-finish" id="finishWorkoutBtn">Finish Workout</button>
+            </section>
+        </div>
+
+        <!-- Rest Timer Modal -->
+        <div id="restTimerModal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <h2>Rest Timer</h2>
+                <div class="rest-timer-circle">
+                    <span id="restTimerValue">00:00</span>
+                </div>
                 <div class="input-group">
-                    <label>Weight (lbs)</label>
-                    <input type="number" id="weight" placeholder="135" min="0">
+                    <label>Set Rest Time (seconds)</label>
+                    <input type="number" id="restTimeInput" value="90" min="1" max="999">
                 </div>
+                <div class="button-row">
+                    <button class="btn-primary" id="startRestBtn">Start</button>
+                    <button class="btn-secondary" id="pauseRestBtn" style="display:none;">Pause</button>
+                    <button class="btn-secondary" id="resumeRestBtn" style="display:none;">Resume</button>
+                    <button class="btn-secondary" id="stopRestBtn">Stop</button>
+                </div>
+                <button class="btn-close" id="closeRestTimerBtn">Close</button>
+            </div>
+        </div>
+
+        <!-- Add Exercise Modal -->
+        <div id="addExerciseModal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <h2>Add Exercise</h2>
                 <div class="input-group">
-                    <label>Reps</label>
-                    <input type="number" id="reps" placeholder="10" min="1">
+                    <label>Exercise Name</label>
+                    <input type="text" id="exerciseName" placeholder="e.g., Bench Press">
                 </div>
-                <div class="input-group">
-                    <label>Sets</label>
-                    <input type="number" id="sets" placeholder="3" min="1">
+                <div class="button-row">
+                    <button class="btn-primary" id="confirmExerciseBtn">Add</button>
+                    <button class="btn-secondary" id="cancelExerciseBtn">Cancel</button>
                 </div>
             </div>
+        </div>
 
-            <button class="btn-primary" onclick="logWorkout()">Log Set</button>
-        </section>
-
-        <section class="card">
-            <h2>Today's Session</h2>
-            <div id="todayWorkout" class="workout-list">
-                <p class="empty-state">No exercises logged yet. Start your workout!</p>
-            </div>
-            <div id="workoutStats" class="stats-row" style="display:none;">
-                <div class="stat">
-                    <span class="stat-value" id="totalSets">0</span>
-                    <span class="stat-label">Sets</span>
+        <!-- Workout Summary Modal -->
+        <div id="summaryModal" class="modal" style="display:none;">
+            <div class="modal-content">
+                <h2>Workout Complete!</h2>
+                <div class="summary-stats">
+                    <div class="stat">
+                        <span class="stat-value" id="summaryDuration">00:00:00</span>
+                        <span class="stat-label">Duration</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="summaryExercises">0</span>
+                        <span class="stat-label">Exercises</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="summarySets">0</span>
+                        <span class="stat-label">Total Sets</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="summaryVolume">0</span>
+                        <span class="stat-label">Total Volume (lbs)</span>
+                    </div>
                 </div>
-                <div class="stat">
-                    <span class="stat-value" id="totalVolume">0</span>
-                    <span class="stat-label">Total Volume (lbs)</span>
-                </div>
+                <button class="btn-primary" id="closeSummaryBtn">Done</button>
             </div>
-            <button class="btn-secondary" onclick="finishWorkout()" id="finishBtn" style="display:none;">
-                Finish Workout
-            </button>
-        </section>
-
-        <section class="card">
-            <h2>Recent History</h2>
-            <div id="historyList" class="history-list">
-                <p class="empty-state">No workout history yet.</p>
-            </div>
-            <button class="btn-secondary" onclick="clearHistory()" id="clearBtn" style="display:none;">
-                Clear History
-            </button>
-        </section>
+        </div>
     </main>
-
-    <footer>
-        <p>FitTrack Pro v1.0 | Track. Progress. Achieve.</p>
-    </footer>
 
     <script src="script.js"></script>
 </body>
